@@ -1,5 +1,9 @@
+import random
+
 import pygame
 
+from Debris import makedebris, movingdebris
+from otherspace import Player, Projectile
 
 window_width = 800
 window_height = 600
@@ -87,7 +91,19 @@ clock = pygame.time.Clock()
 background_image = pygame.image.load("images\earth.png").convert()
 
 #b1 = button(screen, (400, 300), "Go To Space") # this is a pygame.Rect?
-
+stuff = False
+dirt = []
+metal = []
+dirt_number = random.randint(3, 5)
+metal_number = random.randint(3, 5)
+random_dirt_x = []
+random_dirt_y = []
+random_metal_x = []
+random_metal_y = []
+debrisgroup = pygame.sprite.Group()
+makedebris(dirt_number, random_dirt_x, random_dirt_y, dirt, metal_number, random_metal_x, random_metal_y, metal, window_width, window_height, debrisgroup)
+all_sprites = pygame.sprite.Group()
+player = Player()
 while exit:
 
     screen.fill((0,0,0))
@@ -101,29 +117,44 @@ while exit:
                 exit = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if b1.collidepoint(pygame.mouse.get_pos()):  # checks a collision with a pygame.Rect and the mouse pos
-                print("SLAYING") #placeholder for new frame function
-                screen.fill(RED)
+                print("SLAYING")  # placeholder for new frame function
+                for x in range(dirt_number):
+                    all_sprites_list.add(dirt[x])
+                for x in range(metal_number):
+                    all_sprites_list.add(metal[x])
+                all_sprites_list.remove(info)
+                all_sprites_list.remove(scotty)
+                all_sprites.add(player)
 
+                stuff = True
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        scotty.moveLeft(5)
-    if keys[pygame.K_RIGHT]:
-        scotty.moveRight(5)
-    if keys[pygame.K_DOWN]:
-        scotty.moveForward(8)
-    if keys[pygame.K_UP]:
-        scotty.moveBack(8)
+    if(stuff):
+        background_image = pygame.image.load("images\Space_1.png").convert()
+        movingdebris(dirt_number, random_dirt_x, random_dirt_y, dirt, metal_number, random_metal_x, random_metal_y, metal, window_width, window_height)
 
-    if pygame.sprite.spritecollideany(scotty, informations):
-        font = pygame.font.SysFont('Arial', 25)
-        pygame.display.set_caption('Box Test')
-        screen.fill(GRAY)
-        screen.blit(font.render('PLEASE save us from the space trash! Go!', True, (255, 0, 0)), (200, 100))
-        b1 = button(screen, (400, 300), "Walk to the SKY!")  # this is a pygame.Rect?
+    else:
+        if keys[pygame.K_LEFT]:
+            scotty.moveLeft(5)
+        if keys[pygame.K_RIGHT]:
+            scotty.moveRight(5)
+        if keys[pygame.K_DOWN]:
+            scotty.moveForward(8)
+        if keys[pygame.K_UP]:
+            scotty.moveBack(8)
+
+        if pygame.sprite.spritecollideany(scotty, informations):
+            font = pygame.font.SysFont('Arial', 25)
+            pygame.display.set_caption('Box Test')
+            screen.fill(GRAY)
+            screen.blit(font.render('PLEASE save us from the space trash! Go!', True, (255, 0, 0)), (200, 100))
+            b1 = button(screen, (400, 300), "Walk to the SKY!")  # this is a pygame.Rect?
 
 
         # Add dialogue text and buttons here
-    all_sprites_list.update()
+    pressed_keys = pygame.key.get_pressed()
+
+    player.update(pressed_keys)
+    all_sprites_list.update(pressed_keys)
     all_sprites_list.draw(screen)
 
     pygame.display.flip()
