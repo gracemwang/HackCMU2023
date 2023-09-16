@@ -1,12 +1,10 @@
-# Import the pygame module
 import pygame
-
-# Import random for random numbers
 import random
-
-# Import pygame.locals for easier access to key coordinates
-# Updated to conform to flake8 and black standards
 from pygame.locals import *
+
+import Player as p
+import Debris1 as d1
+import Debris2 as d2
 
 # Define constants for the screen width and height
 SCREEN_WIDTH = 800
@@ -23,109 +21,6 @@ score = 0
 
 prev_hit = False
 game=False
-
-
-# Define a player object by extending pygame.sprite.Sprite
-# The surface drawn on the screen is now an attribute of 'player'
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        super(Player, self).__init__()
-        self.surf = pygame.image.load("images\scottyRocket.png").convert()
-        # self.surf.set_colorkey((0, 0, 0), RLEACCEL)
-        self.surf = pygame.transform.scale(self.surf, (100, 100))
-        # self.surf.fill((255, 255, 255))
-        self.rect = self.surf.get_rect()
-
-        self.hspeed = 5
-        self.vspeed = 5
-
-        self.rect = self.surf.get_rect(
-            center=(
-                SCREEN_WIDTH / 2,
-                SCREEN_HEIGHT / 2,
-            )
-        )
-
-    # Move the sprite based on user keypresses
-    def update(self, pressed_keys):
-        if pressed_keys[K_UP]:
-            self.rect.move_ip(0, -1 * self.vspeed)
-        if pressed_keys[K_DOWN]:
-            self.rect.move_ip(0, self.vspeed)
-        if pressed_keys[K_LEFT]:
-            self.rect.move_ip(-1 * self.hspeed, 0)
-        if pressed_keys[K_RIGHT]:
-            self.rect.move_ip(self.hspeed, 0)
-
-        # Keep player on the screen
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.right > SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
-        if self.rect.top <= 0:
-            self.rect.top = 0
-        if self.rect.bottom >= SCREEN_HEIGHT:
-            self.rect.bottom = SCREEN_HEIGHT
-
-        PLAYER_H = (self.rect.left + self.rect.right) / 2
-        PLAYER_V = (self.rect.top + self.rect.bottom) / 2
-
-
-# Define the enemy object by extending pygame.sprite.Sprite
-# The surface you draw on the screen is now an attribute of 'enemy'
-class Debris1(pygame.sprite.Sprite):
-    def __init__(self):
-        super(Debris1, self).__init__()
-        self.surf = pygame.image.load("images\debris1.png").convert()
-        self.surf = pygame.transform.scale(self.surf, (50, 50))
-        self.surf.set_colorkey((71, 112, 76), RLEACCEL)
-        self.rect = self.surf.get_rect(
-            center=(
-                random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),
-                random.randint(0, SCREEN_HEIGHT),
-            )
-        )
-        self.hspeed = random.randint(5, 20)
-        self.vspeed = random.randint(-5, 5)
-
-    # Move the sprite based on speed
-    # Remove the sprite when it passes the left edge of the screen
-    def update(self):
-        self.rect.move_ip(-self.hspeed, self.vspeed)
-        if self.rect.right < 0:
-            self.kill()
-        if self.rect.top < 0:
-            self.kill()
-        if self.rect.bottom > SCREEN_HEIGHT:
-            self.kill()
-
-
-class Debris2(pygame.sprite.Sprite):
-    def __init__(self):
-        super(Debris2, self).__init__()
-        self.surf = pygame.image.load("images\debris2.png").convert()
-        self.surf = pygame.transform.scale(self.surf, (50, 50))
-        self.surf.set_colorkey((71, 112, 76), RLEACCEL)
-        self.rect = self.surf.get_rect(
-            center=(
-                random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),
-                random.randint(0, SCREEN_HEIGHT),
-            )
-        )
-        self.hspeed = random.randint(5, 20)
-        self.vspeed = random.randint(-5, 5)
-
-    # Move the sprite based on speed
-    # Remove the sprite when it passes the left edge of the screen
-    def update(self):
-        self.rect.move_ip(-self.hspeed, self.vspeed)
-        if self.rect.right < 0:
-            self.kill()
-        if self.rect.top < 0:
-            self.kill()
-        if self.rect.bottom > SCREEN_HEIGHT:
-            self.kill()
-
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self):
@@ -207,7 +102,7 @@ HIT = pygame.USEREVENT + 2
 pygame.time.set_timer(HIT, 1000)
 
 # Instantiate player. Right now, this is just a rectangle.
-player = Player()
+player = p.Player()
 
 # Create groups to hold enemy sprites and all sprites
 # - enemies is used for collision detection and position updates
@@ -304,10 +199,10 @@ while running:
             # Add a new enemy?
             if event.type == ADDDEBRIS:
                 # Create the new enemy and add it to sprite groups
-                new_debris1 = Debris1()
+                new_debris1 = d1.Debris1()
                 debris1.add(new_debris1)
                 all_sprites.add(new_debris1)
-                new_debris2 = Debris2()
+                new_debris2 = d2.Debris2()
                 debris2.add(new_debris2)
                 all_sprites.add(new_debris2)
 
@@ -315,11 +210,11 @@ while running:
                 hit1 = pygame.sprite.spritecollide(player, debris1, False)
                 hit2 = pygame.sprite.spritecollide(player, debris2, False)
                 for hit in hit1:
-                    health -= 10
+                    health -= 100
                     hit.vspeed *= -1
                     hit.hspeed *= -1
                 for hit in hit2:
-                    health -= 5
+                    health -= 100
                     hit.vspeed *= -1
                     hit.hspeed *= -1
     # Get the set of keys pressed and check for user input
