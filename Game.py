@@ -210,11 +210,11 @@ while running:
                 hit1 = pygame.sprite.spritecollide(player, debris1, False)
                 hit2 = pygame.sprite.spritecollide(player, debris2, False)
                 for hit in hit1:
-                    health -= 100
+                    health -= 10
                     hit.vspeed *= -1
                     hit.hspeed *= -1
                 for hit in hit2:
-                    health -= 100
+                    health -= 5
                     hit.vspeed *= -1
                     hit.hspeed *= -1
     # Get the set of keys pressed and check for user input
