@@ -15,6 +15,19 @@ GRAY = (50, 50, 50)
 WHITE = (255,255,255)
 #INSIDE OF THE GAME LOOP
 
+def button(screen, position, text):
+    font = pygame.font.SysFont("Arial", 50)
+    text_render = font.render(text, 1, (255, 0, 0))
+    x, y, w , h = text_render.get_rect()
+    x, y = position
+    pygame.draw.line(screen, (150, 150, 150), (x, y), (x + w , y), 5)
+    pygame.draw.line(screen, (150, 150, 150), (x, y - 2), (x, y + h), 5)
+    pygame.draw.line(screen, (50, 50, 50), (x, y + h), (x + w , y + h), 5)
+    pygame.draw.line(screen, (50, 50, 50), (x + w , y+h), [x + w , y], 5)
+    pygame.draw.rect(screen, (100, 100, 100), (x, y, w , h))
+    #print("screen.blit...", screen.blit(text_render, (x, y)))
+    return screen.blit(text_render, (x, y)) # this is a rect pygame.Rect
+
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, color, height, width):
         super().__init__()
@@ -73,7 +86,10 @@ clock = pygame.time.Clock()
 
 background_image = pygame.image.load("images\earth.png").convert()
 
+#b1 = button(screen, (400, 300), "Go To Space") # this is a pygame.Rect?
+
 while exit:
+
     screen.fill((0,0,0))
     screen.blit(background_image, [0, 0])
 
@@ -83,6 +99,10 @@ while exit:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
                 exit = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if b1.collidepoint(pygame.mouse.get_pos()):  # checks a collision with a pygame.Rect and the mouse pos
+                print("SLAYING") #placeholder for new frame function
+                screen.fill(RED)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -90,15 +110,17 @@ while exit:
     if keys[pygame.K_RIGHT]:
         scotty.moveRight(5)
     if keys[pygame.K_DOWN]:
-        scotty.moveForward(5)
+        scotty.moveForward(8)
     if keys[pygame.K_UP]:
-        scotty.moveBack(5)
+        scotty.moveBack(8)
 
     if pygame.sprite.spritecollideany(scotty, informations):
         font = pygame.font.SysFont('Arial', 25)
         pygame.display.set_caption('Box Test')
         screen.fill(GRAY)
         screen.blit(font.render('PLEASE save us from the space trash! Go!', True, (255, 0, 0)), (200, 100))
+        b1 = button(screen, (400, 300), "Walk to the SKY!")  # this is a pygame.Rect?
+
 
         # Add dialogue text and buttons here
     all_sprites_list.update()
